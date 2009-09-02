@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'davclient'
+require 'vrtx'
+
+def print_usage
+  puts "usage: vrtx COMMAND [ARGS]"
+  puts ""
+  puts "Available vrtx commands:"
+  puts "   ls       List files on webdav server"
+  puts "   pwd      Print current working url"
+  puts "   cd       Change current working url"
+  puts "   publish  Publish document"
+  puts "   props    Print webdav properties for url"
+  puts ""
+  puts "Available vortex specifiwebdav commands:"
+  puts "See 'vrtx COMMAND -h' for more information on a specific command."
+  exit
+end
+
+
+command =  ARGV[0]
+if(command == "-h" or command =~ /help/ or command =~ /\?/) then
+  print_usage
+end
+
+if(command == "-v" or command =~ /version/ ) then
+  puts "vrtx version " + WebDAV.version ### TODO Vortex.version
+  exit
+end
+
+args = ARGV[1..200]
+
+print_usage if(args == nil)
+
+# Scan ARGV for public url's and convert to dav-url's.
+# and print out warning to user (if no --silent flag ?)
+if(args.grep(/^http:/))then
+  new_args = []
+  args.each do |arg|
+    if(arg =~ /^http:/)then
+      arg = Vortex.url2davUrl(arg)
+      puts "Warning: changing url to webdav url: " + arg
+      new_args += [arg]
+    else
+      new_args += [arg]
+    end
+  end
+  args = new_args
+end
+
+
+case command
+  when "ls" then
+    require 'davclient/dav-ls'
+    WDav.ls(ARGV[1..200])
+  when "pwd"
+    require 'davclient/dav-pwd'
+  when "cd"
+    require 'davclient/dav-cd'
+    WDav.cd(ARGV[1..200])
+  when "props"
+    require 'davclient/dav_propfind'
+  else
+    puts "Unknown command :'" + command + "'"
+    print_usage
+end

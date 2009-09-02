@@ -1,0 +1,62 @@
+= Vrtx
+
+== DESCRIPTION:
+
+Command line utility for managing content in the open source content management system Vortex.
+
+Vortex is fully manageable via the WebDAV server extensions. The
+vrtx command line utility is a subproject of the general WebDAV client
+davclient.rubyforge.org.
+
+== Requirements
+
+The command line utility curl installed. Available from
+http://curl.haxx.se/ or on linux:
+
+  sudo apt-get install curl
+
+== LIRBRARY SYNOPSIS:
+
+  require 'rubygems'
+  require 'vrtx'
+
+  url = 'http://test.webdav.org/dav/'
+  Vortex.cd(url)
+  Vortex.publish("Title", "Introducion")
+
+
+== COMMAND LINE UTILITES:
+
+Vortex inlcudes the command line utility 'vrtx'. Use 'vrx cd url' to set current working url
+and 'vrtx ls' to list content of a collection (directory).
+
+== COMMAND LINE SYNOPSIS:
+
+  >vrtx cd http://test.webdav.org/dav/
+  http://test.webdav.org/dav/
+  >vrtx ls
+  images/
+  index.html
+  >vrtx pwd
+  http://test.webdav.org/dav/
+  >vrtx publish --title "Title" --introduction "Intro"
+  Published "Title" to: http://test.webdav.org/dav/title.html
+
+== INSTALL:
+
+  [sudo] gem install vrxt
+
+or
+
+  git clone git://github.com/thomasfl/vrtx.git
+  cd vrtx
+  gem build Rakefile
+  sudo gem install vrxt-x.x.x.gem
+
+== Background:
+
+The library is suitable for creating scripts that update content on webservers
+with the CMS Vortex and WebDAV http extions installed.
+
+See also "DavClient":http://github.com/thomasfl/davclient/tree/master
+
