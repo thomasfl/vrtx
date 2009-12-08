@@ -1,31 +1,69 @@
-# Rakefile for WebDAVTools   -*- ruby -*-
-# Usage:
-#
-#  gem build Rakefile
-#  sudo gem install webdavtools-x.x.x.gem
+require 'rubygems'
+require 'rake'
 
-spec = Gem::Specification.new do |s|
-  s.name = "vrtx"
-  s.version = "0.0.1"
-  s.author = "Thomas Flemming"
-  s.email = "thomas.flemming@gmail.com"
-  s.homepage = "http://folk.uio.no/thomasfl"
-  s.platform = Gem::Platform::RUBY
-  s.summary = "Command line utility for Vortex CMS."
-  s.description = "Client library and command line tool for " +
-                   "managing content on webservers with WebDAV " +
-                   "and the open source Vortex CMS."
-  s.requirements << "cURL command line tool available from http://curl.haxx.se/"
-  s.requirements << "Servername, username and password must be supplied in ~/.netrc file."
-  s.files = ["lib/vrtx.rb", "bin/vrtx"]
-  s.executables = ["vrtx"]
-  s.require_path = "lib"
-  s.rubyforge_project = "vrtx"
-  #  s.test_files = FileList["{test}/**/*test.rb"].to_a
-  s.has_rdoc = true
-  s.extra_rdoc_files = ["README.rdoc"]
-  s.add_dependency("davclient", ">= 0.0.1")
-  s.add_dependency("hpricot", ">= 0.6")
-  s.add_dependency("zentest", ">= 3.5")
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gem|
+    gem.name = "vrtx"
+    gem.summary = %Q{Extensions to the WebDAV client Net::HTTP for use with the Vortex CMS}
+    gem.description = %Q{WebDAV client library for use with the Vortex CMS library using Net::HTTP}
+    gem.email = "c1.github@niftybox.net"
+    gem.homepage = "http://github.com/thomasfl/vrtx"
+    gem.authors = ["Thomas Flemming", "Lise Hamre"]
+    gem.executables = ["vrtx"]
+    gem.add_dependency "net_dav", ">= 0.0.4"
+    gem.add_development_dependency "rspec", ">= 1.2.0"
+    gem.add_development_dependency "webrick-webdav", ">= 1.0"
+    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+  end
+  Jeweler::GemcutterTasks.new
+rescue LoadError
+  puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
+end
+
+require 'spec/rake/spectask'
+Spec::Rake::SpecTask.new(:spec) do |spec|
+  spec.libs << 'lib' << 'spec'
+  spec.spec_files = FileList['spec/**/*_spec.rb']
+end
+
+Spec::Rake::SpecTask.new(:rcov) do |spec|
+  spec.libs << 'lib' << 'spec'
+  spec.pattern = 'spec/**/*_spec.rb'
+  spec.rcov = true
+end
+
+task :spec => :check_dependencies
+
+task :default => :spec
+
+desc "release with no version change"
+task :dist => [:clean, :release]
+
+namespace :dist do
+  desc "release patch"
+  task :patch => [:clean, "version:bump:patch", :release]
+  desc "release with minor version bump"
+  task :minor => [:clean, "version:bump:minor", :release]
+end
+
+desc "build gem into pkg directory"
+task :gem => [:build]
+
+task :clean do
+  Dir.glob("**/*~").each do |file|
+    File.unlink file
+  end
+  puts "cleaned"
+end
+
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rdoc|
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.title = "net_dav #{version}"
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
